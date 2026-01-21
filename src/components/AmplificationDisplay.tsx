@@ -32,27 +32,6 @@ export default function AmplificationDisplay({ metrics }: AmplificationDisplayPr
             {metrics.amplificationFactor.toFixed(1)}x
           </div>
         </div>
-
-        <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded col-span-2">
-          <div className="text-sm text-gray-600 dark:text-gray-400">Decibel Gain</div>
-          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-            {metrics.decibelGain.toFixed(1)} dB
-          </div>
-        </div>
-
-        <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded">
-          <div className="text-sm text-gray-600 dark:text-gray-400">Input Pressure</div>
-          <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-            {metrics.inputPressure.toFixed(2)}
-          </div>
-        </div>
-
-        <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded">
-          <div className="text-sm text-gray-600 dark:text-gray-400">Output Pressure</div>
-          <div className="text-lg font-semibold text-red-600 dark:text-red-400">
-            {metrics.outputPressure.toFixed(2)}
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">

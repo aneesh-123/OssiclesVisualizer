@@ -1,78 +1,109 @@
-import { motion } from 'framer-motion';
 import { BoneSizes } from '../utils/physics';
 import Ossicles from './Ossicles';
-import SoundWave from './SoundWave';
 import {
   DEFAULT_EARDRUM_AREA,
-  DEFAULT_OVAL_WINDOW_AREA,
   VISUAL_SCALE,
 } from '../utils/constants';
 
 interface EarDiagramProps {
   boneSizes: BoneSizes;
-  frequency: number;
-  intensity: number;
   isAnimating: boolean;
 }
 
-export default function EarDiagram({
-  boneSizes,
-  frequency,
-  intensity,
-  isAnimating,
-}: EarDiagramProps) {
-  const svgWidth = 800;
-  const svgHeight = 600;
+export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) {
+  const svgWidth = 1200;
+  const svgHeight = 800;
 
-  // Calculate scaled areas
+  // Eardrum visual size (simple fixed size for now)
   const eardrumArea = (boneSizes.eardrum ?? 1.0) * DEFAULT_EARDRUM_AREA;
-  const ovalWindowArea = (boneSizes.ovalWindow ?? 1.0) * DEFAULT_OVAL_WINDOW_AREA;
-  
-  // Visual representation sizes
   const eardrumRadius = Math.sqrt(eardrumArea / Math.PI) * VISUAL_SCALE * 0.5;
-  const ovalWindowRadius = Math.sqrt(ovalWindowArea / Math.PI) * VISUAL_SCALE * 0.5;
 
-  // Positions
-  const earCanalX = 100;
-  const earCanalY = 100;
-  const earCanalWidth = 150;
-  const earCanalHeight = 200;
+  // Realistic ear canal positions - curved, anatomical shape
+  const earCanalStartX = 100;
+  const earCanalStartY = 200;
+  const earCanalMidX = 250;
+  const earCanalMidY = 300;
+  const earCanalEndX = 380;
+  const earCanalEndY = 400;
+  const earCanalStartWidth = 80; // Wider at entrance
+  const earCanalMidWidth = 50;   // Narrower in middle
+  const earCanalEndWidth = 35;   // Narrowest at eardrum
 
-  const eardrumX = earCanalX + earCanalWidth;
-  const eardrumY = earCanalY + earCanalHeight / 2;
+  const eardrumX = earCanalEndX;
+  const eardrumY = earCanalEndY;
 
-  const ossiclesX = eardrumX + 50;
+  // More space for larger, well-spaced ossicles
+  const ossiclesX = eardrumX + 120;
   const ossiclesY = eardrumY;
 
-  const ovalWindowX = ossiclesX + 200;
-  const ovalWindowY = ossiclesY - 50;
+  // Calculate bone dimensions (same as in Ossicles component) - much larger sizes
+  const malleusScale = boneSizes.malleus;
+  const incusScale = boneSizes.incus;
+  const stapesScale = boneSizes.stapes;
+  
+  const malleusHeadRadius = 50 * malleusScale;
+  const malleusHandleLength = 100 * malleusScale;
+  const malleusNeckLength = 30 * malleusScale;
+  const incusLongProcessLength = 80 * incusScale;
+  const stapesCruraLength = 60 * stapesScale;
 
-  // Pressure visualization colors
-  const inputPressureColor = `rgba(100, 150, 255, ${0.3 + intensity * 0.4})`;
-  const outputPressureColor = `rgba(255, 100, 100, ${0.3 + intensity * 0.6})`;
+  // Calculate bone connection points with proper spacing (matching Ossicles component)
+  const malleusNeckX = ossiclesX + malleusHandleLength * 0.65;
+  const malleusNeckY = ossiclesY - malleusHandleLength * 0.25;
+  const malleusHeadX = malleusNeckX + malleusNeckLength;
+  const malleusHeadY = malleusNeckY;
+  // More spacing between bones
+  const incusBodyX = malleusHeadX + malleusHeadRadius * 1.5;
+  const incusBodyY = malleusHeadY;
+  const incusLongProcessEndX = incusBodyX + incusLongProcessLength * 0.65;
+  const incusLongProcessEndY = incusBodyY - incusLongProcessLength * 0.35;
+  const stapesHeadX = incusLongProcessEndX + 15; // More gap
+  const stapesHeadY = incusLongProcessEndY;
 
   return (
-    <div className="flex justify-center items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+    <div className="flex justify-center items-center p-4">
       <svg
         width={svgWidth}
         height={svgHeight}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         className="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
       >
-        {/* Ear Canal */}
-        <rect
-          x={earCanalX}
-          y={earCanalY}
-          width={earCanalWidth}
-          height={earCanalHeight}
-          fill="#E5E7EB"
+        {/* Ear Canal - Realistic curved, anatomical shape */}
+        <defs>
+          <linearGradient id="earCanalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#F9FAFB" />
+            <stop offset="50%" stopColor="#F3F4F6" />
+            <stop offset="100%" stopColor="#E5E7EB" />
+          </linearGradient>
+          <radialGradient id="earCanalDepth" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#E5E7EB" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#9CA3AF" stopOpacity="0.6" />
+          </radialGradient>
+        </defs>
+        {/* Main ear canal path - curved S-shape */}
+        <path
+          d={`M ${earCanalStartX},${earCanalStartY - earCanalStartWidth / 2}
+              Q ${earCanalStartX + 60},${earCanalStartY - 20} ${earCanalMidX},${earCanalMidY - earCanalMidWidth / 2}
+              Q ${earCanalMidX + 50},${earCanalMidY} ${earCanalEndX},${earCanalEndY - earCanalEndWidth / 2}
+              L ${earCanalEndX},${earCanalEndY + earCanalEndWidth / 2}
+              Q ${earCanalMidX + 50},${earCanalMidY + earCanalMidWidth} ${earCanalMidX},${earCanalMidY + earCanalMidWidth / 2}
+              Q ${earCanalStartX + 60},${earCanalStartY + earCanalStartWidth + 20} ${earCanalStartX},${earCanalStartY + earCanalStartWidth / 2}
+              Z`}
+          fill="url(#earCanalGradient)"
           stroke="#9CA3AF"
-          strokeWidth={2}
-          rx={5}
+          strokeWidth={2.5}
+        />
+        {/* Inner depth shadow */}
+        <ellipse
+          cx={earCanalMidX}
+          cy={earCanalMidY}
+          rx={earCanalMidWidth * 0.3}
+          ry={earCanalMidWidth * 0.2}
+          fill="url(#earCanalDepth)"
         />
         <text
-          x={earCanalX + earCanalWidth / 2}
-          y={earCanalY - 10}
+          x={earCanalStartX + 80}
+          y={earCanalStartY - 30}
           textAnchor="middle"
           fontSize="14"
           fill="#666"
@@ -81,28 +112,34 @@ export default function EarDiagram({
           Ear Canal
         </text>
 
-        {/* Sound Waves in Ear Canal */}
-        <SoundWave
-          frequency={frequency}
-          intensity={intensity}
-          isActive={isAnimating}
-          x={earCanalX + 20}
-          y={earCanalY + 20}
-          width={earCanalWidth - 40}
-          height={earCanalHeight - 40}
-        />
-
-        {/* Eardrum (Tympanic Membrane) */}
+        {/* Eardrum (Tympanic Membrane) - Pinkish membrane, side view (tall and narrow) */}
+        <defs>
+          <linearGradient id="eardrumGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#F8BBD0" stopOpacity="0.9" />
+            <stop offset="50%" stopColor="#F48FB1" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#EC407A" stopOpacity="0.8" />
+          </linearGradient>
+        </defs>
         <g>
+          {/* Main membrane - tall and narrow (side view) */}
           <ellipse
             cx={eardrumX}
             cy={eardrumY}
-            rx={eardrumRadius}
-            ry={eardrumRadius * 0.6}
-            fill={inputPressureColor}
-            stroke="#4B5563"
-            strokeWidth={3}
-            opacity={0.7}
+            rx={eardrumRadius * 0.4}
+            ry={eardrumRadius * 1.2}
+            fill="url(#eardrumGradient)"
+            stroke="#C2185B"
+            strokeWidth={2.5}
+            opacity={0.85}
+          />
+          {/* Membrane texture/light reflection */}
+          <ellipse
+            cx={eardrumX - eardrumRadius * 0.15}
+            cy={eardrumY - eardrumRadius * 0.3}
+            rx={eardrumRadius * 0.2}
+            ry={eardrumRadius * 0.4}
+            fill="#FFFFFF"
+            opacity={0.3}
           />
           <text
             x={eardrumX}
@@ -129,7 +166,7 @@ export default function EarDiagram({
         <Ossicles
           boneSizes={boneSizes}
           isAnimating={isAnimating}
-          animationIntensity={intensity}
+          animationIntensity={1}
           x={ossiclesX}
           y={ossiclesY}
         />
@@ -143,107 +180,9 @@ export default function EarDiagram({
           stroke="#666"
           strokeWidth={2}
           strokeDasharray="3,3"
-          opacity={0.5}
-        />
-
-        {/* Oval Window */}
-        <g>
-          <ellipse
-            cx={ovalWindowX}
-            cy={ovalWindowY}
-            rx={ovalWindowRadius}
-            ry={ovalWindowRadius * 0.8}
-            fill={outputPressureColor}
-            stroke="#DC2626"
-            strokeWidth={3}
-            opacity={0.8}
-          />
-          <text
-            x={ovalWindowX}
-            y={ovalWindowY - ovalWindowRadius - 10}
-            textAnchor="middle"
-            fontSize="12"
-            fill="#666"
-            className="font-semibold"
-          >
-            Oval Window
-          </text>
-          <text
-            x={ovalWindowX}
-            y={ovalWindowY - ovalWindowRadius + 5}
-            textAnchor="middle"
-            fontSize="10"
-            fill="#999"
-          >
-            {ovalWindowArea.toFixed(1)} mm²
-          </text>
-        </g>
-
-        {/* Connection from Stapes to Oval Window */}
-        <line
-          x1={ossiclesX + 200}
-          y1={ossiclesY - 50}
-          x2={ovalWindowX - ovalWindowRadius * 0.8}
-          y2={ovalWindowY}
-          stroke="#666"
-          strokeWidth={2}
-          strokeDasharray="3,3"
-          opacity={0.5}
-        />
-
-        {/* Pressure indicators */}
-        {isAnimating && (
-          <>
-            {/* Input pressure indicator */}
-            <motion.circle
-              cx={eardrumX}
-              cy={eardrumY}
-              r={eardrumRadius * 0.8}
-              fill="none"
-              stroke="rgba(100, 150, 255, 0.5)"
-              strokeWidth={2}
-              initial={{ scale: 1, opacity: 0.5 }}
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            />
-
-            {/* Output pressure indicator */}
-            <motion.circle
-              cx={ovalWindowX}
-              cy={ovalWindowY}
-              r={ovalWindowRadius * 1.2}
-              fill="none"
-              stroke="rgba(255, 100, 100, 0.6)"
-              strokeWidth={3}
-              initial={{ scale: 1, opacity: 0.6 }}
-              animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }}
-            />
-          </>
-        )}
-
-        {/* Arrow showing sound flow */}
-        <defs>
-          <marker
-            id="arrowhead"
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="3"
-            orient="auto"
-          >
-            <polygon points="0 0, 10 3, 0 6" fill="#666" />
-          </marker>
-        </defs>
-        <path
-          d={`M ${earCanalX + earCanalWidth} ${eardrumY} L ${ovalWindowX - ovalWindowRadius} ${ovalWindowY}`}
-          stroke="#666"
-          strokeWidth={2}
-          fill="none"
-          strokeDasharray="5,5"
           opacity={0.3}
-          markerEnd="url(#arrowhead)"
         />
+
       </svg>
     </div>
   );
