@@ -17,7 +17,6 @@ const USE_SVG_FILES = true;
 interface OssiclesProps {
   boneSizes: BoneSizes;
   isAnimating: boolean;
-  animationIntensity: number;
   x: number;
   y: number;
 }
@@ -25,7 +24,6 @@ interface OssiclesProps {
 export default function Ossicles({
   boneSizes,
   isAnimating,
-  animationIntensity,
   x,
   y,
 }: OssiclesProps) {
@@ -73,125 +71,107 @@ export default function Ossicles({
   const stapesHeadX = incusLongProcessEndX + 15; // Larger gap
   const stapesHeadY = incusLongProcessEndY;
 
-  // Animation offsets
-  const animOffset = isAnimating ? animationIntensity * 2 : 0;
-
   return (
     <g className="ossicles">
       {/* Malleus (Hammer) */}
-      <motion.g
-        transform={`translate(${malleusHandleX}, ${malleusHandleY})`}
-        animate={
-          isAnimating
-            ? {
-                x: [0, animOffset, 0],
-                y: [0, -animOffset * 0.5, 0],
-                rotate: [0, 2, 0],
-              }
-            : {}
-        }
-        transition={{
-          duration: 0.5,
-          repeat: isAnimating ? Infinity : 0,
-          ease: 'easeInOut',
-        }}
+      <g
+        // Static position/angle we tuned so the malleus rests correctly on the eardrum
+        transform={`translate(${malleusHandleX}, ${malleusHandleY}) rotate(-20)`}
       >
-        {USE_SVG_FILES ? (
-          <image 
-            href={malleusSvgUrl} 
-            width={200 * malleusScale} 
-            height={300 * malleusScale}
-            x={-100 * malleusScale} 
-            y={-150 * malleusScale}
-            preserveAspectRatio="xMidYMid meet"
-          />
-        ) : (
-          <>
-        {/* Handle (manubrium) - more realistic, thicker, curved */}
-        <path
-          d={`M 0,0 
-              Q ${malleusHandleLength * 0.3},${-malleusHandleLength * 0.12} 
-              ${malleusHandleLength * 0.6},${-malleusHandleLength * 0.22}
-              Q ${malleusHandleLength * 0.7},${-malleusHandleLength * 0.25} 
-              ${malleusHandleLength * 0.65},${-malleusHandleLength * 0.25}`}
-          stroke="#8B4513"
-          strokeWidth={malleusHandleWidth * malleusScale}
-          fill="none"
-          strokeLinecap="round"
-        />
-        {/* Neck - thicker, more defined */}
-        <ellipse
-          cx={malleusHandleLength * 0.65 + malleusNeckLength * 0.5}
-          cy={-malleusHandleLength * 0.25}
-          rx={malleusNeckLength * 0.8}
-          ry={malleusHandleWidth * 0.8 * malleusScale}
-          fill="#A0522D"
-          stroke="#654321"
-          strokeWidth={3}
-        />
-        {/* Head (connects to incus) - larger, more hammer-like */}
-        <ellipse
-          cx={malleusHandleLength * 0.65 + malleusNeckLength}
-          cy={-malleusHandleLength * 0.25}
-          rx={malleusHeadRadius}
-          ry={malleusHeadRadius * 0.9}
-          fill="#A0522D"
-          stroke="#654321"
-          strokeWidth={4}
-        />
-        {/* Lateral process on head - more prominent */}
-        <ellipse
-          cx={malleusHandleLength * 0.65 + malleusNeckLength + malleusHeadRadius * 0.65}
-          cy={-malleusHandleLength * 0.25 - malleusHeadRadius * 0.35}
-          rx={malleusHeadRadius * 0.5}
-          ry={malleusHeadRadius * 0.4}
-          fill="#8B4513"
-          stroke="#654321"
-          strokeWidth={2.5}
-        />
-        {/* Anterior process */}
-        <ellipse
-          cx={malleusHandleLength * 0.65 + malleusNeckLength - malleusHeadRadius * 0.3}
-          cy={-malleusHandleLength * 0.25 - malleusHeadRadius * 0.2}
-          rx={malleusHeadRadius * 0.3}
-          ry={malleusHeadRadius * 0.25}
-          fill="#8B4513"
-          stroke="#654321"
-          strokeWidth={2}
-        />
-        <text
-          x={malleusHandleLength * 0.325}
-          y={-malleusHandleLength * 0.25 + 40}
-          fontSize="14"
-          fill="#666"
-          className="font-semibold"
-          textAnchor="middle"
+        <motion.g
+          animate={
+            isAnimating
+              ? { rotate: [-3, 3, -3] }
+              : { rotate: 0 }
+          }
+          transition={{
+            duration: 0.6,
+            repeat: isAnimating ? Infinity : 0,
+            ease: 'easeInOut',
+          }}
         >
-          Malleus
-        </text>
-          </>
-        )}
-      </motion.g>
+          {USE_SVG_FILES ? (
+            <image
+              href={malleusSvgUrl}
+              width={200 * malleusScale}
+              height={300 * malleusScale}
+              x={-100 * malleusScale}
+              // Align bottom of the malleus image with the local origin (0,0),
+              // so the base of the malleus can sit directly on the eardrum.
+              y={-300 * malleusScale}
+              preserveAspectRatio="xMidYMid meet"
+            />
+          ) : (
+            <>
+              {/* Handle (manubrium) - more realistic, thicker, curved */}
+              <path
+                d={`M 0,0 
+                    Q ${malleusHandleLength * 0.3},${-malleusHandleLength * 0.12} 
+                    ${malleusHandleLength * 0.6},${-malleusHandleLength * 0.22}
+                    Q ${malleusHandleLength * 0.7},${-malleusHandleLength * 0.25} 
+                    ${malleusHandleLength * 0.65},${-malleusHandleLength * 0.25}`}
+                stroke="#8B4513"
+                strokeWidth={malleusHandleWidth * malleusScale}
+                fill="none"
+                strokeLinecap="round"
+              />
+              {/* Neck - thicker, more defined */}
+              <ellipse
+                cx={malleusHandleLength * 0.65 + malleusNeckLength * 0.5}
+                cy={-malleusHandleLength * 0.25}
+                rx={malleusNeckLength * 0.8}
+                ry={malleusHandleWidth * 0.8 * malleusScale}
+                fill="#A0522D"
+                stroke="#654321"
+                strokeWidth={3}
+              />
+              {/* Head (connects to incus) - larger, more hammer-like */}
+              <ellipse
+                cx={malleusHandleLength * 0.65 + malleusNeckLength}
+                cy={-malleusHandleLength * 0.25}
+                rx={malleusHeadRadius}
+                ry={malleusHeadRadius * 0.9}
+                fill="#A0522D"
+                stroke="#654321"
+                strokeWidth={4}
+              />
+              {/* Lateral process on head - more prominent */}
+              <ellipse
+                cx={malleusHandleLength * 0.65 + malleusNeckLength + malleusHeadRadius * 0.65}
+                cy={-malleusHandleLength * 0.25 - malleusHeadRadius * 0.35}
+                rx={malleusHeadRadius * 0.5}
+                ry={malleusHeadRadius * 0.4}
+                fill="#8B4513"
+                stroke="#654321"
+                strokeWidth={2.5}
+              />
+              {/* Anterior process */}
+              <ellipse
+                cx={malleusHandleLength * 0.65 + malleusNeckLength - malleusHeadRadius * 0.3}
+                cy={-malleusHandleLength * 0.25 - malleusHeadRadius * 0.2}
+                rx={malleusHeadRadius * 0.3}
+                ry={malleusHeadRadius * 0.25}
+                fill="#8B4513"
+                stroke="#654321"
+                strokeWidth={2}
+              />
+              <text
+                x={malleusHandleLength * 0.325}
+                y={-malleusHandleLength * 0.25 + 40}
+                fontSize="14"
+                fill="#666"
+                className="font-semibold"
+                textAnchor="middle"
+              >
+                Malleus
+              </text>
+            </>
+          )}
+        </motion.g>
+      </g>
 
       {/* Incus (Anvil) */}
-      <motion.g
-        transform={`translate(${incusBodyX}, ${incusBodyY})`}
-        animate={
-          isAnimating
-            ? {
-                x: [0, animOffset * 0.7, 0],
-                y: [0, -animOffset * 0.3, 0],
-                rotate: [0, -1.5, 0],
-              }
-            : {}
-        }
-        transition={{
-          duration: 0.5,
-          repeat: isAnimating ? Infinity : 0,
-          ease: 'easeInOut',
-          delay: 0.1,
-        }}
-      >
+      <g transform={`translate(${incusBodyX}, ${incusBodyY})`}>
         {USE_SVG_FILES ? (
           <image
             href={incusSvgUrl}
@@ -258,26 +238,10 @@ export default function Ossicles({
             </text>
           </>
         )}
-      </motion.g>
+      </g>
 
       {/* Stapes (Stirrup) */}
-      <motion.g
-        transform={`translate(${stapesHeadX}, ${stapesHeadY}) rotate(-90)`}
-        animate={
-          isAnimating
-            ? {
-                x: [0, animOffset * 0.5, 0],
-                y: [0, -animOffset * 0.8, 0],
-              }
-            : {}
-        }
-        transition={{
-          duration: 0.5,
-          repeat: isAnimating ? Infinity : 0,
-          ease: 'easeInOut',
-          delay: 0.2,
-        }}
-      >
+      <g transform={`translate(${stapesHeadX}, ${stapesHeadY}) rotate(-90)`}>
         {USE_SVG_FILES ? (
           <image
             href={stapesSvgUrl}
@@ -361,7 +325,7 @@ export default function Ossicles({
             </text>
           </>
         )}
-      </motion.g>
+      </g>
     </g>
   );
 }

@@ -3,56 +3,60 @@ import EarDiagram from './components/EarDiagram';
 import { BoneSizes } from './utils/physics';
 
 function App() {
-  const boneSizes: BoneSizes = {
+  const [boneSizes, setBoneSizes] = useState<BoneSizes>({
     malleus: 1.0,
     incus: 1.0,
     stapes: 1.0,
     eardrum: 1.0,
     ovalWindow: 1.0,
-  };
+  });
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-            Ossicles Sound Amplification Visualizer
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Explore how the three bones in the human ear amplify sound through size ratios and lever mechanics
-          </p>
-          {/* Play/Pause Button */}
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-8">
+      <div
+        className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 w-full max-w-3xl"
+        style={{ height: '450px' }}
+      >
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Malleus size
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0.5}
+                max={2}
+                step={0.05}
+                value={boneSizes.malleus}
+                onChange={(e) =>
+                  setBoneSizes((prev) => ({
+                    ...prev,
+                    malleus: parseFloat(e.target.value),
+                  }))
+                }
+                className="flex-1 accent-blue-600"
+              />
+              <span className="w-12 text-right text-sm text-gray-700">
+                {(boneSizes.malleus * 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-lg ${
-              isPlaying
+            type="button"
+            onClick={() => setIsAnimating((prev) => !prev)}
+            className={`px-4 py-2 rounded-md text-sm font-semibold shadow ${
+              isAnimating
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : 'bg-green-600 hover:bg-green-700 text-white'
             }`}
           >
-            {isPlaying ? (
-              <>
-                <span className="text-2xl">⏸</span>
-                <span>Pause Animation</span>
-              </>
-            ) : (
-              <>
-                <span className="text-2xl">▶</span>
-                <span>Play Animation</span>
-              </>
-            )}
+            {isAnimating ? 'Pause' : 'Animate'}
           </button>
-        </header>
-
-        {/* Main Content - Single visualization panel in a white box */}
-        <div className="flex justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
-            <EarDiagram boneSizes={boneSizes} isAnimating={isPlaying} />
-          </div>
         </div>
+        <EarDiagram boneSizes={boneSizes} isAnimating={isAnimating} />
       </div>
     </div>
   );
