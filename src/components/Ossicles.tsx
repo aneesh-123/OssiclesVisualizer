@@ -61,22 +61,25 @@ export default function Ossicles({
   const malleusHeadX = malleusNeckX + malleusNeckLength;
   const malleusHeadY = malleusNeckY;
 
-  // Incus: body connects to malleus head with generous spacing, long process connects to stapes
-  const incusBodyX = malleusHeadX + malleusHeadRadius * 1.5; // Much more spacing
-  const incusBodyY = malleusHeadY;
+  // Incus: body connects to malleus head - adjust spacing multiplier to nestle closer
+  // Line 65: Change the multiplier (currently 1.5) to reduce spacing (e.g., 0.8, 1.0, 1.2)
+  const incusBodyX = malleusHeadX + malleusHeadRadius * 0.5; // Reduced spacing to nestle against malleus
+  // Line 66: Adjust Y position if needed (currently matches malleusHeadY)
+  const incusBodyY = malleusHeadY - 170;
   const incusLongProcessEndX = incusBodyX + incusLongProcessLength * 0.65;
   const incusLongProcessEndY = incusBodyY - incusLongProcessLength * 0.35;
 
   // Stapes: head connects to incus long process with spacing, footplate connects to oval window
-  const stapesHeadX = incusLongProcessEndX + 15; // Larger gap
-  const stapesHeadY = incusLongProcessEndY;
+  const stapesHeadX = incusLongProcessEndX + 100; // Larger gap
+  const stapesHeadY = incusLongProcessEndY + 140;
 
   return (
     <g className="ossicles">
       {/* Malleus (Hammer) */}
       <g
         // Static position/angle we tuned so the malleus rests correctly on the eardrum
-        transform={`translate(${malleusHandleX}, ${malleusHandleY}) rotate(-20)`}
+        // Rotated 15 degrees clockwise from -20 to -5
+        transform={`translate(${malleusHandleX}, ${malleusHandleY}) rotate(-5)`}
       >
         <motion.g
           animate={
@@ -171,18 +174,30 @@ export default function Ossicles({
       </g>
 
       {/* Incus (Anvil) */}
-      <g transform={`translate(${incusBodyX}, ${incusBodyY})`}>
-        {USE_SVG_FILES ? (
-          <image
-            href={incusSvgUrl}
-            width={200 * incusScale}
-            height={300 * incusScale}
-            x={-100 * incusScale}
-            y={-150 * incusScale}
-            preserveAspectRatio="xMidYMid meet"
-          />
-        ) : (
-          <>
+      <g transform={`translate(${incusBodyX}, ${incusBodyY}) rotate(-45)`}>
+        <motion.g
+          animate={
+            isAnimating
+              ? { rotate: [-3, 3, -3] }
+              : { rotate: 0 }
+          }
+          transition={{
+            duration: 0.6,
+            repeat: isAnimating ? Infinity : 0,
+            ease: 'easeInOut',
+          }}
+        >
+          {USE_SVG_FILES ? (
+            <image
+              href={incusSvgUrl}
+              width={200 * incusScale}
+              height={300 * incusScale}
+              x={-100 * incusScale}
+              y={-150 * incusScale}
+              preserveAspectRatio="xMidYMid meet"
+            />
+          ) : (
+            <>
             {/* Body (connects to malleus head) - more realistic anvil shape */}
             <path
               d={`M ${-incusBodyWidth * 0.85},${-incusBodyHeight * 0.25} 
@@ -237,22 +252,35 @@ export default function Ossicles({
               Incus
             </text>
           </>
-        )}
+          )}
+        </motion.g>
       </g>
 
       {/* Stapes (Stirrup) */}
-      <g transform={`translate(${stapesHeadX}, ${stapesHeadY}) rotate(-90)`}>
-        {USE_SVG_FILES ? (
-          <image
-            href={stapesSvgUrl}
-            width={200 * stapesScale}
-            height={300 * stapesScale}
-            x={-100 * stapesScale}
-            y={-150 * stapesScale}
-            preserveAspectRatio="xMidYMid meet"
-          />
-        ) : (
-          <>
+      <g transform={`translate(${stapesHeadX}, ${stapesHeadY}) rotate(90)`}>
+        <motion.g
+          animate={
+            isAnimating
+              ? { rotate: [-3, 3, -3] }
+              : { rotate: 0 }
+          }
+          transition={{
+            duration: 0.6,
+            repeat: isAnimating ? Infinity : 0,
+            ease: 'easeInOut',
+          }}
+        >
+          {USE_SVG_FILES ? (
+            <image
+              href={stapesSvgUrl}
+              width={200 * stapesScale}
+              height={300 * stapesScale}
+              x={-100 * stapesScale}
+              y={-150 * stapesScale}
+              preserveAspectRatio="xMidYMid meet"
+            />
+          ) : (
+            <>
             {/* Head (connects to incus long process) - larger, more defined */}
             <ellipse
               cx={0}
@@ -324,7 +352,8 @@ export default function Ossicles({
               Stapes
             </text>
           </>
-        )}
+          )}
+        </motion.g>
       </g>
     </g>
   );

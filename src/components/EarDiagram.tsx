@@ -3,6 +3,7 @@ import { BoneSizes } from '../utils/physics';
 import Ossicles from './Ossicles';
 import {
   DEFAULT_EARDRUM_AREA,
+  DEFAULT_OVAL_WINDOW_AREA,
   VISUAL_SCALE,
 } from '../utils/constants';
 
@@ -57,14 +58,38 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   const incusBodyY = malleusHeadY;
   const incusLongProcessEndX = incusBodyX + incusLongProcessLength * 0.65;
   const incusLongProcessEndY = incusBodyY - incusLongProcessLength * 0.35;
-  const stapesHeadX = incusLongProcessEndX + 15; // More gap
-  const stapesHeadY = incusLongProcessEndY;
+  // Note: Actual stapes position is calculated in Ossicles component
+  // We'll calculate approximate position here for oval window placement
+  const stapesHeadX = incusLongProcessEndX + 100; // Match Ossicles calculation
+  const stapesHeadY = incusLongProcessEndY + 140; // Match Ossicles calculation
+  
+  // Calculate stapes footplate position (where it connects to oval window)
+  // Stapes is rotated 90 degrees clockwise in Ossicles
+  // In the hand-drawn version, footplate is at cy = stapesCruraLength + stapesFootplateHeight * 0.5
+  // After 90° clockwise rotation, this becomes an X offset (to the right)
+  const stapesFootplateWidth = 45 * stapesScale;
+  const stapesFootplateHeight = 12 * stapesScale;
+  const stapesHeadRadius = 25 * stapesScale;
+  // With 90° clockwise rotation, the footplate extends to the right of the head
+  const footplateOffset = stapesCruraLength + stapesFootplateHeight * 0.5;
+  const stapesFootplateX = stapesHeadX + footplateOffset;
+  const stapesFootplateY = stapesHeadY;
+  
+  // Oval window position - positioned to connect directly to stapes footplate
+  const ovalWindowArea = (boneSizes.ovalWindow ?? 1.0) * DEFAULT_OVAL_WINDOW_AREA;
+  const ovalWindowRadius = Math.sqrt(ovalWindowArea / Math.PI) * VISUAL_SCALE * 0.5;
+  // Oval window height matches stapes head height (the other side, not the footplate)
+  // Stapes head is an ellipse with ry = stapesHeadRadius * 0.75, so full height is ry * 2
+  const ovalWindowHeight = stapesHeadRadius * 0.75 * 2;
+  // Position oval window to the right of the footplate, aligned with it
+  const ovalWindowX = stapesFootplateX + stapesFootplateWidth * 0.5 + ovalWindowRadius + 5;
+  const ovalWindowY = stapesFootplateY - 100;
 
-  // ViewBox for the main diagram area
+  // ViewBox for the main diagram area - expanded to accommodate all bones at larger sizes
   const viewBoxX = 0;
-  const viewBoxY = 0;
-  const viewBoxWidth = 800;
-  const viewBoxHeight = 600;
+  const viewBoxY = 200; // Start higher to give more vertical space
+  const viewBoxWidth = 1000; // Expanded width to accommodate all bones (malleus, incus, stapes)
+  const viewBoxHeight = 400; // Expanded height to accommodate all bones
 
   return (
     <svg
@@ -73,8 +98,8 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
       preserveAspectRatio="xMidYMid meet"
       style={{ display: 'block' }}
     >
-        {/* White background rectangle */}
-        <rect x={0} y={0} width={viewBoxWidth} height={viewBoxHeight} fill="#ffffff" />
+        {/* White background rectangle - matches viewBox exactly */}
+        <rect x={viewBoxX} y={viewBoxY} width={viewBoxWidth} height={viewBoxHeight} fill="#ffffff" />
         {/* Ear Canal - Realistic curved, anatomical shape */}
         <defs>
           <linearGradient id="earCanalGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -154,7 +179,30 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
         {/* Ossicles */}
         <Ossicles boneSizes={boneSizes} isAnimating={isAnimating} x={ossiclesX} y={ossiclesY} />
 
-        {/* Malleus is positioned so its base touches the eardrum, no extra connector needed */}
+        {/* Oval Window - positioned to align with stapes footplate */}
+        <motion.g
+          animate={
+            isAnimating
+              ? { scale: [1, 1.05, 1] }
+              : { scale: 1 }
+          }
+          transition={{
+            duration: 0.6,
+            repeat: isAnimating ? Infinity : 0,
+            ease: 'easeInOut',
+          }}
+        >
+          <ellipse
+            cx={ovalWindowX}
+            cy={ovalWindowY}
+            rx={ovalWindowRadius}
+            ry={ovalWindowHeight}
+            fill="rgba(255, 200, 200, 0.6)"
+            stroke="#DC2626"
+            strokeWidth={3}
+            opacity={0.8}
+          />
+        </motion.g>
     </svg>
   );
 }
