@@ -17,7 +17,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-8">
       <div
         className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 w-full max-w-6xl"
-        style={{ height: '600px' }}
+        style={{ height: '700px' }}
       >
         <div className="mb-4 space-y-3">
           <div className="flex items-center justify-between gap-4">

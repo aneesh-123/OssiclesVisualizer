@@ -61,17 +61,17 @@ export default function Ossicles({
   const malleusHeadX = malleusNeckX + malleusNeckLength;
   const malleusHeadY = malleusNeckY;
 
-  // Incus: body connects to malleus head - adjust spacing multiplier to nestle closer
-  // Line 65: Change the multiplier (currently 1.5) to reduce spacing (e.g., 0.8, 1.0, 1.2)
-  const incusBodyX = malleusHeadX + malleusHeadRadius * 0.5; // Reduced spacing to nestle against malleus
-  // Line 66: Adjust Y position if needed (currently matches malleusHeadY)
-  const incusBodyY = malleusHeadY - 170;
+  // Incus: body connects to malleus head - spacing scales with both bones
+  const incusBodyX = malleusHeadX + malleusHeadRadius * 0.5; // Spacing scales with malleus size
+  const incusBodyY = malleusHeadY - 170 * incusScale; // Y position scales with incus size
   const incusLongProcessEndX = incusBodyX + incusLongProcessLength * 0.65;
   const incusLongProcessEndY = incusBodyY - incusLongProcessLength * 0.35;
 
   // Stapes: head connects to incus long process with spacing, footplate connects to oval window
-  const stapesHeadX = incusLongProcessEndX + 100; // Larger gap
-  const stapesHeadY = incusLongProcessEndY + 140;
+  // Spacing scales with both incus and stapes sizes
+  const stapesSpacing = 100 * Math.max(incusScale, stapesScale); // Gap scales with bone sizes
+  const stapesHeadX = incusLongProcessEndX + stapesSpacing;
+  const stapesHeadY = incusLongProcessEndY + 140 * stapesScale; // Y offset scales with stapes size
 
   return (
     <g className="ossicles">

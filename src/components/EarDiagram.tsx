@@ -35,7 +35,7 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   // Position ossicles so the malleus handle base (0,0) connects slightly above the
   // eardrum's lower edge, and shifted right so it doesn't block the membrane
   const ossiclesX = eardrumX + eardrumRadius * 0.5 + 50; // previous +20, now +30 more = +50
-  const ossiclesY = eardrumY - eardrumRadius * 0.2 + 30; // previous +10, now +20 more = +30
+  const ossiclesY = eardrumY - eardrumRadius * 0.2 + 50; // Moved down to provide more space for expansion
 
   // Calculate bone dimensions (same as in Ossicles component) - much larger sizes
   const malleusScale = boneSizes.malleus;
@@ -53,15 +53,16 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   const malleusNeckY = ossiclesY - malleusHandleLength * 0.25;
   const malleusHeadX = malleusNeckX + malleusNeckLength;
   const malleusHeadY = malleusNeckY;
-  // More spacing between bones
+  // More spacing between bones - scales with bone sizes
   const incusBodyX = malleusHeadX + malleusHeadRadius * 1.5;
   const incusBodyY = malleusHeadY;
   const incusLongProcessEndX = incusBodyX + incusLongProcessLength * 0.65;
   const incusLongProcessEndY = incusBodyY - incusLongProcessLength * 0.35;
   // Note: Actual stapes position is calculated in Ossicles component
-  // We'll calculate approximate position here for oval window placement
-  const stapesHeadX = incusLongProcessEndX + 100; // Match Ossicles calculation
-  const stapesHeadY = incusLongProcessEndY + 140; // Match Ossicles calculation
+  // We'll calculate approximate position here for oval window placement - scales with bone sizes
+  const stapesSpacing = 100 * Math.max(incusScale, stapesScale); // Match Ossicles calculation
+  const stapesHeadX = incusLongProcessEndX + stapesSpacing;
+  const stapesHeadY = incusLongProcessEndY + 140 * stapesScale; // Match Ossicles calculation
   
   // Calculate stapes footplate position (where it connects to oval window)
   // Stapes is rotated 90 degrees clockwise in Ossicles
@@ -77,19 +78,19 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   
   // Oval window position - positioned to connect directly to stapes footplate
   const ovalWindowArea = (boneSizes.ovalWindow ?? 1.0) * DEFAULT_OVAL_WINDOW_AREA;
-  const ovalWindowRadius = Math.sqrt(ovalWindowArea / Math.PI) * VISUAL_SCALE * 0.5;
+  const ovalWindowRadius = Math.sqrt(ovalWindowArea / Math.PI) * VISUAL_SCALE * 0.8; // Increased from 0.5 to 0.8 to make it wider
   // Oval window height matches stapes head height (the other side, not the footplate)
   // Stapes head is an ellipse with ry = stapesHeadRadius * 0.75, so full height is ry * 2
-  const ovalWindowHeight = stapesHeadRadius * 0.75 * 2;
+  const ovalWindowHeight = stapesHeadRadius * 0.75 * 4;
   // Position oval window to the right of the footplate, aligned with it
-  const ovalWindowX = stapesFootplateX + stapesFootplateWidth * 0.5 + ovalWindowRadius + 5;
-  const ovalWindowY = stapesFootplateY - 100;
+  const ovalWindowX = stapesFootplateX + stapesFootplateWidth * 0.5 + ovalWindowRadius - 20;
+  const ovalWindowY = stapesFootplateY - 250
 
   // ViewBox for the main diagram area - expanded to accommodate all bones at larger sizes
   const viewBoxX = 0;
-  const viewBoxY = 200; // Start higher to give more vertical space
+  const viewBoxY = 50; // Start from top to show more vertical space
   const viewBoxWidth = 1000; // Expanded width to accommodate all bones (malleus, incus, stapes)
-  const viewBoxHeight = 400; // Expanded height to accommodate all bones
+  const viewBoxHeight = 600; // Increased height to accommodate larger bones and prevent overlap with sliders
 
   return (
     <svg
