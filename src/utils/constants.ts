@@ -1,13 +1,13 @@
 // Anatomical measurements and default values
 
-export const DEFAULT_EARDRUM_AREA = 60; // mm² (average of 55-65 mm²)
-export const DEFAULT_OVAL_WINDOW_AREA = 3.2; // mm²
-export const DEFAULT_AREA_RATIO = DEFAULT_EARDRUM_AREA / DEFAULT_OVAL_WINDOW_AREA; // ~17:1
+export const DEFAULT_EARDRUM_AREA = 55; // mm²
+export const DEFAULT_OVAL_WINDOW_AREA = 3.2; // mm² (stapes footplate area)
+export const DEFAULT_AREA_RATIO = DEFAULT_EARDRUM_AREA / DEFAULT_OVAL_WINDOW_AREA; // 17:1
 
-export const DEFAULT_MALLEUS_SIZE = 8.5; // mm (average of 8-9mm)
-export const DEFAULT_INCUS_SIZE = 7; // mm
-export const DEFAULT_STAPES_SIZE = 3.5; // mm
-export const DEFAULT_LEVER_RATIO = 1.3; // mechanical advantage
+// Default lever arm lengths for physiological lever ratio of ~1.3:1
+export const DEFAULT_INPUT_LEVER_ARM = 9.1; // mm (effective input lever arm length)
+export const DEFAULT_OUTPUT_LEVER_ARM = 7.0; // mm (effective output lever arm length)
+export const DEFAULT_LEVER_RATIO = DEFAULT_INPUT_LEVER_ARM / DEFAULT_OUTPUT_LEVER_ARM; // ~1.3:1 (~2-3 dB gain)
 
 // Realistic ranges for bone sizes (as multipliers of default)
 export const BONE_SIZE_RANGES = {

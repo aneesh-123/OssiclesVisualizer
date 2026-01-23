@@ -27,10 +27,12 @@ export default function Ossicles({
   x,
   y,
 }: OssiclesProps) {
-  // Base sizes scaled by bone size multipliers
-  const malleusScale = boneSizes.malleus;
-  const incusScale = boneSizes.incus;
-  const stapesScale = boneSizes.stapes;
+  // Visual scaling: Map lever arm multipliers to visual bone scales
+  // Input lever arm affects malleus/incus visual size, output lever arm affects stapes
+  // Scale proportionally to lever arm multipliers (maintains visual relationship)
+  const malleusScale = boneSizes.inputLeverArm * 0.7 + 0.3; // Scale 0.5-1.5 range
+  const incusScale = boneSizes.inputLeverArm * 0.7 + 0.3;
+  const stapesScale = boneSizes.outputLeverArm * 0.7 + 0.3;
 
   // Malleus dimensions (hammer shape) - Much larger, more realistic sizes
   const malleusHeadRadius = 50 * malleusScale;

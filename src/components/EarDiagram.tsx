@@ -37,10 +37,10 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   const ossiclesX = eardrumX + eardrumRadius * 0.5 + 50; // previous +20, now +30 more = +50
   const ossiclesY = eardrumY - eardrumRadius * 0.2 + 50; // Moved down to provide more space for expansion
 
-  // Calculate bone dimensions (same as in Ossicles component) - much larger sizes
-  const malleusScale = boneSizes.malleus;
-  const incusScale = boneSizes.incus;
-  const stapesScale = boneSizes.stapes;
+  // Visual scaling: Map lever arm multipliers to visual bone scales (for positioning calculations)
+  const malleusScale = boneSizes.inputLeverArm * 0.7 + 0.3;
+  const incusScale = boneSizes.inputLeverArm * 0.7 + 0.3;
+  const stapesScale = boneSizes.outputLeverArm * 0.7 + 0.3;
   
   const malleusHeadRadius = 50 * malleusScale;
   const malleusHandleLength = 100 * malleusScale;
@@ -77,14 +77,15 @@ export default function EarDiagram({ boneSizes, isAnimating }: EarDiagramProps) 
   const stapesFootplateY = stapesHeadY;
   
   // Oval window position - positioned to connect directly to stapes footplate
+  // Oval window size scales with boneSizes.ovalWindow multiplier
   const ovalWindowArea = (boneSizes.ovalWindow ?? 1.0) * DEFAULT_OVAL_WINDOW_AREA;
   const ovalWindowRadius = Math.sqrt(ovalWindowArea / Math.PI) * VISUAL_SCALE * 0.8; // Increased from 0.5 to 0.8 to make it wider
-  // Oval window height matches stapes head height (the other side, not the footplate)
-  // Stapes head is an ellipse with ry = stapesHeadRadius * 0.75, so full height is ry * 2
-  const ovalWindowHeight = stapesHeadRadius * 0.75 * 4;
+  // Oval window height - scales with oval window size
+  const baseStapesHeadRadius = 25; // Base size for height calculation
+  const ovalWindowHeight = baseStapesHeadRadius * 0.75 * 4 * (boneSizes.ovalWindow ?? 1.0);
   // Position oval window to the right of the footplate, aligned with it
-  const ovalWindowX = stapesFootplateX + stapesFootplateWidth * 0.5 + ovalWindowRadius - 20;
-  const ovalWindowY = stapesFootplateY - 250
+  const ovalWindowX = stapesFootplateX + stapesFootplateWidth * 0.5 + ovalWindowRadius - 10;
+  const ovalWindowY = stapesFootplateY - 150
 
   // ViewBox for the main diagram area - expanded to accommodate all bones at larger sizes
   const viewBoxX = 0;
